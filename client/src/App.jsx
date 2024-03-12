@@ -6,7 +6,7 @@ import Login from "./components/LogIn"
 import SignUp from "./components/SignUp"
 import Navbar from "./components/Navbar"
 
-import Friends from "./components/Friends"
+import MainFeed from "./components/MainFeed/MainFeed"
 
 
 
@@ -19,7 +19,7 @@ function App() {
           <Route path="/log-in" element={<Login/>}></Route>
           <Route path="/sign-up" element={<SignUp/>}></Route>
           <Route path="/home" element={<Navbar/>}>
-            <Route path="" element={<Friends/>}></Route>
+            <Route path="" element={<MainFeed/>}></Route>
           </Route>
         </Routes>
     </Router>

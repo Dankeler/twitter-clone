@@ -8,15 +8,18 @@ const passport = require("passport")
 const jwt = require("jsonwebtoken")
 
 const User = require("../models/user")
+const Post = require("../models/post")
+const Comment = require("../models/comment")
 
 function authenticateUser(req, res, next) {
   const authHeader = req.headers["authorization"]
+  const token = authHeader.split(" ")[1]
 
   if (!authHeader) {
     return res.status(401).json({error: "Unauthorized user"})
   }
 
-  jwt.verify(authHeader, process.env.SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
     req.user = user
     next()
   })
@@ -58,10 +61,16 @@ router.post("/log-in", asyncHandler(async (req, res, next) => {
         console.log(err)
       }
     const accessToken = jwt.sign({id: user.id, username: user.username}, process.env.SECRET_KEY)
-    const base64Avatar = user.avatar.toString("base64")
-    console.log(base64Avatar)
+    
+    let avatarToSend = user.avatar
+    console.log(user.avatar)
+    if (user.avatar === null) {
+      avatarToSend = null
+    } else {
+      avatarToSend = user.avatar.toString("base64")
+    }
 
-    return res.status(200).json({id: user.id, username: user.username, avatar: base64Avatar, accessToken})
+    return res.status(200).json({id: user.id, username: user.username, avatar: avatarToSend, accessToken})
     })
   })(req, res, next)
 }))
@@ -79,6 +88,22 @@ router.post("/home/log-out", authenticateUser, asyncHandler(async (req, res, nex
     }
   })
   res.status(200).send("Logged Out")
+}))
+
+// MAINFEED GET POSTS
+router.get("/posts", authenticateUser, asyncHandler(async (req, res, next) => {
+  const posts = await Post.find().populate("author", "username").populate("comments").sort({datecreated: -1})
+  res.status(200).json(posts)
+}))
+
+router.post("/post/create", authenticateUser, asyncHandler(async (req, res, next) => {
+  const post = new Post({
+    author: req.user.id,
+    content: req.body.postText
+  })
+
+  await post.save()
+  res.status(200).json(post)
 }))
 
 module.exports = router;

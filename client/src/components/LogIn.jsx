@@ -15,10 +15,11 @@ const Login = () => {
 
             if (response.status === 200) {
                 setLogged("asdfasdf")
-                console.log(response)
                 localStorage.setItem("accessToken", response.data.accessToken)
                 localStorage.setItem("username", response.data.username)
-                localStorage.setItem("avatar", response.data.avatar)
+                if (response.data.avatar) {
+                    localStorage.setItem("avatar", response.data.avatar)
+                }
             }
         } catch(err) {
             console.log(err)

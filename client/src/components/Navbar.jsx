@@ -20,10 +20,11 @@ const Navbar = () => {
             if (localStorage.getItem("accessToken")) {
                 setUsername(localStorage.getItem("username"));
                 const avatarBuffer = localStorage.getItem("avatar")
-                const avatarBase64 = Buffer.from(avatarBuffer, "base64")
-                const avatarUrl = `${avatarBase64}`
-                console.log(avatarUrl)
-                setAvatarDataUrl(avatarUrl)
+                if (avatarBuffer) {
+                    const avatarBase64 = Buffer.from(avatarBuffer, "base64")
+                    const avatarUrl = `${avatarBase64}`
+                    setAvatarDataUrl(avatarUrl)
+                }
                 setIsLoading(false)
             }
         };
@@ -39,7 +40,6 @@ const Navbar = () => {
             })
 
             if (response.status === 200) {
-                console.log(response)
                 localStorage.clear()
                 setUsername(null)
             }
@@ -64,7 +64,7 @@ const Navbar = () => {
                                 </div>
                                 <div className="flex px-6 cursor-pointer h-full items-center" onClick={() => setMenuOpen(!menuOpen)}>
                                     <span className="text-bg font-medium mx-6">{username}</span>
-                                    {avatarUrl && <img src={avatarUrl} alt="User Avatar" className="rounded-full h-full w-full" />}
+                                    <img src={avatarUrl ? avatarUrl : sample_avatar} alt="User Avatar" className="rounded-full h-full w-full" />
                                     {menuOpen && (
                                         <div className="absolute right-0 top-12 w-48 bg-white border rounded shadow-lg">
                                             <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Profile</a>
