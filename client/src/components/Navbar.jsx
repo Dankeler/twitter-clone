@@ -56,7 +56,7 @@ const Navbar = () => {
                         <Navigate to="/" />
                     ) : (
                         <>
-                            <div className="w-screen p-0 h-[5%] flex justify-between outline outline-1 outline-white">
+                            <div className="w-full p-0 h-[5%] flex justify-between outline outline-1 outline-white">
                                 <div className="flex justify-center min-w-64 px-6 h-full items-center">
                                     <p className="border-white border-x-4 flex items-center h-full w-20 justify-center">Home</p>
                                     <p className="flex items-center h-full w-20 justify-center">Friends</p>
