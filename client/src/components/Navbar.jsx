@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet, Link } from "react-router-dom"
 import axios from "axios"
 import sample_avatar from "../assets/sample-avatar.jpg"
 import {Buffer} from "buffer"
@@ -58,8 +58,12 @@ const Navbar = () => {
                         <>
                             <div className="w-full p-0 h-[5%] flex justify-between outline outline-1 outline-white">
                                 <div className="flex justify-center min-w-64 px-6 h-full items-center">
-                                    <p className="border-white border-x-4 flex items-center h-full w-20 justify-center">Home</p>
-                                    <p className="flex items-center h-full w-20 justify-center">Friends</p>
+                                    <button className="border-white border-x-4 flex items-center h-full w-20 justify-center">
+                                        <Link to="/home" className="flex items-center h-full w-20 justify-center">Home</Link>
+                                    </button>
+                                    <button>
+                                        <Link to="/home/users" className="flex items-center h-full w-20 justify-center">Users</Link>
+                                    </button>
                                     <p className="border-white border-x-4 flex items-center h-full w-20 justify-center">Groups</p>
                                 </div>
                                 <div className="flex px-6 cursor-pointer h-full items-center" onClick={() => setMenuOpen(!menuOpen)}>

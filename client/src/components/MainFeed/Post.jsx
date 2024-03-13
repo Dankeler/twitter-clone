@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {FaThumbsUp} from "react-icons/fa"
 import sample_photo from "../../assets/sample-avatar.jpg"
 import {Buffer} from "buffer"
+import axios from "axios"
 
 import Comment from "../MainFeed/Comment"
 import Replay from "../MainFeed/Replay"
@@ -13,6 +14,7 @@ const Post = (props) => {
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showReplay, setShowReplay] = useState(false)
+  const [addLike, setAddLike] = useState(props.props.likes.length)
 
   const [comments, setComments] = useState([])
 
@@ -31,6 +33,24 @@ const Post = (props) => {
     getAvatar()
     setLoading(false)
   }, [])
+
+  const id = props.props._id
+
+  const handleLiking = async () => {
+    try {
+      const response = await axios.patch("http://localhost:3000/post/like", {id}, {
+        headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
+
+      })
+      if (response.status === 200) {
+        setAddLike(addLike + 1)
+      } else {
+        setAddLike(addLike - 1)
+      }
+    } catch(err) {
+      console.log(err)
+    }
+  }
  
 
   return (
@@ -44,9 +64,9 @@ const Post = (props) => {
       </div>
       <p className="mt-2 text-left">{props.props.content}</p>
       <div className="mt-2 flex items-center">
-      <button className="text-white hover:text-blue-500 flex items-center justify-start">
+      <button className="text-white hover:text-blue-500 flex items-center justify-start" onClick={handleLiking}>
           <div className="flex gap-1 items-center">
-            <p>{props.props.likes}</p>
+            <p>{addLike}</p>
             <FaThumbsUp/>
           </div>
         </button>

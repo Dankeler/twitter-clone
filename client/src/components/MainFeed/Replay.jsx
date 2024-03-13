@@ -5,7 +5,7 @@ import { useState } from "react"
 const Replay = (props) => {
     const [replayContent, setReplyContent] = useState("")
     const id = props.id
-    console.log(props)
+
 
     const replaySend = async (e) => {
         e.preventDefault()

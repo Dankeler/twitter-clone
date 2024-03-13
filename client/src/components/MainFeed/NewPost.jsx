@@ -21,7 +21,6 @@ const NewPost = (props) => {
             if (response.status === 200) {
                 setPostText("")
                 props.setRefresh(prevRefresh => !prevRefresh)
-                console.log(props)
             }
         } catch(err) {
             console.log(err)
