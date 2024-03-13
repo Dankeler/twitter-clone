@@ -14,10 +14,13 @@ const Post = (props) => {
   const [loading, setLoading] = useState(true)
   const [showReplay, setShowReplay] = useState(false)
 
+  const [comments, setComments] = useState([])
+
   const timeAgo = formatDistanceToNow(new Date(props.props.datecreated), { addSuffix: true });
 
   useEffect(() => {
     setLoading(true)
+    setComments(props.props.comments)
     const getAvatar = () => {
       if (props.props.author.avatar !== null && props.props.author.avatar.data) {
         const avatarBase64 = Buffer.from(props.props.author.avatar.data, "base64")
@@ -54,8 +57,10 @@ const Post = (props) => {
           </svg>
         </button>
       </div>
-      {showReplay && <Replay id={props.props._id}></Replay>}
-      <Comment/>
+      {showReplay && <Replay id={props.props._id} refresh={props.refresh} setRefresh={props.setRefresh}></Replay>}
+      {comments && comments.map((comment, idx) => (
+        <Comment key={idx} props={comment}></Comment>
+      ))}
     </div>
   );
 }

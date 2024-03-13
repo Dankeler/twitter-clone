@@ -2,7 +2,7 @@
 import axios from "axios"
 import { useState } from "react"
 
-const NewPost = () => {
+const NewPost = (props) => {
     const [postText, setPostText] = useState("")
     const [errorMessage, setErrorMessage] = useState(null)
 
@@ -20,7 +20,8 @@ const NewPost = () => {
 
             if (response.status === 200) {
                 setPostText("")
-                console.log("gitek")
+                props.setRefresh(prevRefresh => !prevRefresh)
+                console.log(props)
             }
         } catch(err) {
             console.log(err)

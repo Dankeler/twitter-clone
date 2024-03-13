@@ -5,6 +5,7 @@ import { useState } from "react"
 const Replay = (props) => {
     const [replayContent, setReplyContent] = useState("")
     const id = props.id
+    console.log(props)
 
     const replaySend = async (e) => {
         e.preventDefault()
@@ -12,7 +13,7 @@ const Replay = (props) => {
             await axios.post("http://localhost:3000/post/comment/create", {replayContent, id}, {
                 headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
             })
-            console.log("good")
+            props.setRefresh(prevRefresh => !prevRefresh)
         } catch(err) {
             console.log(err)
         }

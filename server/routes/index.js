@@ -92,7 +92,11 @@ router.post("/home/log-out", authenticateUser, asyncHandler(async (req, res, nex
 
 // MAINFEED GET POSTS
 router.get("/posts", authenticateUser, asyncHandler(async (req, res, next) => {
-  const posts = await Post.find().populate("author", ["username", "avatar"]).populate("comments").sort({datecreated: -1})
+  const posts = await Post.find().populate("author", ["username", "avatar"]).populate({
+    path: 'comments',
+    populate: { path: 'author', select: 'username avatar' }
+  }).sort({datecreated: -1})
+  
   res.status(200).json(posts)
 }))
 
@@ -117,5 +121,4 @@ router.post("/post/comment/create", authenticateUser, asyncHandler(async (req, r
   await post.save()
   res.status(200).send("good")
 }))
-
 module.exports = router;

@@ -29,7 +29,7 @@ const Navbar = () => {
             }
         };
         getUser();
-    }, [avatarUrl]);
+    }, []);
 
 
     const handleLogout = async (e) => {
