@@ -2,10 +2,11 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import sample_photo from "../assets/sample-avatar.jpg"
 import {Buffer} from "buffer"
+import {Link} from "react-router-dom"
 
 const User = (user) => {
   const [avatarUrl, setAvatarUrl] = useState(null)
-  const [friendStatus, setFriendStatus] = useState(null)
+  const [friendStatus, setFriendStatus] = useState("add as friend")
 
   useEffect(() => {
     if (user.user.avatar !== null && user.user.avatar.data) {
@@ -16,27 +17,27 @@ const User = (user) => {
   }, [])
 
   const id = user.user._id
-  console.log(user.user.friends)
 
-  const username = localStorage.getItem("username")
+  const username = localStorage.getItem("id")
   
   useEffect(() => {
-    if (user.user.friends.some(friend => friend.friendId === username)) {
-      if (user.user.friends.some(friend => friend.status === "sent_to")) {
-        setFriendStatus("sent_to");
+      if (user.user.friends.some(friend => friend.friendId === username && friend.status === "added_by")) {
+        setFriendStatus("Confirm as a friend");
+      } else if (user.user.friends.some(friend => friend.friendId === username && friend.status === "friends")) {
+        setFriendStatus("Friends");
       }
-      if (user.user.friends.some(friend => friend.status === "true")) {
-        setFriendStatus("true");
-      }
-    }
   }, []);
   
-
   const sendFriendRequest = async () => {
     try {
-        await axios.patch("http://localhost:3000/home/users", {id}, {
+        const response = await axios.patch("http://localhost:3000/home/users", {id}, {
             headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}
         })
+        if (response.status === 200) {
+          setFriendStatus("Friend request sent")
+        } else if (response.status === 201) {
+          setFriendStatus("Friends")
+        }
     } catch(err) {
         console.log(err)
     }
@@ -44,6 +45,7 @@ const User = (user) => {
 
   return (
     <div className="bg-slate-800 p-3 rounded-lg shadow-lg mt-6 outline outline-slate-700 overflow-y-auto">
+      <Link to={`/home/users/${id}`}>
       <div className="flex items-center">
         <img
           src={avatarUrl ? avatarUrl : sample_photo}
@@ -57,6 +59,7 @@ const User = (user) => {
           <p className="text-white text-left text-balance">{user.user.about}</p>
         </div>
       </div>
+      </Link>
       <button className="float-start" onClick={sendFriendRequest}>
         <p className="mt-2 text-left">{friendStatus}</p>
       </button>

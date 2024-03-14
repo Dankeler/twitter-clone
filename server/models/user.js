@@ -7,7 +7,7 @@ const userSchema = new Schema({
     password: {type: String, required: true},
     about: {type: String, minLength: 5, maxLength: 50},
     avatar: {type: Buffer},
-    friends: [{friendId: {type: String}, status: {type: String, enum: ["sent_to, sent_from, true"]}}]
+    friends: [{friendId: {type: String}, status: {type: String, enum: ["added_by, received_from, friends"]}}]
 })
 
 module.exports = mongoose.model("User", userSchema)

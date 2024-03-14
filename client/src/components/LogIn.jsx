@@ -15,6 +15,7 @@ const Login = () => {
 
             if (response.status === 200) {
                 setLogged("asdfasdf")
+                localStorage.setItem("id", response.data.id)
                 localStorage.setItem("accessToken", response.data.accessToken)
                 localStorage.setItem("username", response.data.username)
                 if (response.data.avatar) {

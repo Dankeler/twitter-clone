@@ -170,39 +170,63 @@ router.get("/home/users", authenticateUser, asyncHandler(async (req, res, next) 
 }))
 
 router.patch("/home/users", authenticateUser, asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.body.id, { friends: 1, username: 1 });
-  const userId = req.user.id; // Assuming userId is already a string
+  const user = await User.findById(req.body.id);
+  const requestingUserId = new mongoose.Types.ObjectId(req.user.id); // Convert user ID to ObjectId
 
-  if (user.friends.some(friend => friend.friendId === userId && friend.status === "true")) {
-    return res.status(400).send("already friends")
+  if (!user) {
+    return res.status(404).send("User not found");
   }
 
-  if (user.friends.some(friend => friend.friendId === userId && friend.status === "sent_from" || friend.status === "sent_to")) {
-    await User.updateOne(
-      { _id: req.body.id, "friends.friendId": req.user.username },
-      { $set: { "friends.$.status": "true" } }
-    );
-    await User.updateOne(
-      { _id: userId, "friends.friendId": user.username }, 
-      { $set: { "friends.$.status": "true" } }
-    );
-    return res.status(200).send("set true");
+  const isAlreadyFriend = user.friends.some(friend => friend.friendId.toString() === requestingUserId.toString() && friend.status === "friends");
+  const becomeFriends = user.friends.find(friend => friend.friendId.toString() === requestingUserId.toString() && friend.status === "added_by");
+  const isRequestedByUser = user.friends.some(friend => friend.friendId.toString() === requestingUserId.toString() && friend.status === "received_from");
+
+  if (isAlreadyFriend) {
+    return res.status(400).send("Already friends");
   }
 
-  if (!user.friends.some(friend => friend.friendId === userId)) {
-    await User.findByIdAndUpdate(
-      req.body.id,
-      { $addToSet: { friends: { friendId: req.user.username, status: "sent_from" } } },
-      { new: true }
-    );
-    await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { friends: { friendId: user.username, status: "sent_to" } } }
-    );
-    return res.status(200).json("set to sent_to");
+  if (isRequestedByUser) {
+    return res.status(400).send("Friend request already sent or received");
   }
 
-  res.status(200).json(user);
+  if (becomeFriends) {
+    await User.findOneAndUpdate(
+      { _id: req.body.id, "friends.friendId": requestingUserId },
+      { $set: { "friends.$.status": "friends" } }
+    );
+  
+    await User.findOneAndUpdate(
+      { _id: req.user.id, "friends.friendId": user._id },
+      { $set: { "friends.$.status": "friends" } }
+    );
+    return res.status(201).send("request accepted")
+  }
+
+  const friendRequest = {
+    friendId: requestingUserId,
+    status: "received_from"
+  };
+
+  await User.findByIdAndUpdate(
+    req.body.id,
+    { $addToSet: { friends: friendRequest } }
+  );
+
+  await User.findByIdAndUpdate(
+    req.user.id,
+    { $addToSet: { friends: { friendId: user._id, status: "added_by" } } }
+  );
+
+  return res.status(200).send("Friend request sent");
 }));
+
+router.get("/home/users/:userId", authenticateUser, asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.userId, {username: 1, about: 1, avatar: 1, friends: 1, posts: 1})
+  const posts = await Post.find({author: req.params.userId}, {content: 1, comments: 1, likes: 1, datecreated: 1}).sort({datecreated: -1})
+  const isFriend = user.friends.find(friend => friend.status === "friends")
+  res.status(200).json({user, posts, isFriend})
+}))
+
+
 
 module.exports = router;
